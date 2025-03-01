@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机网页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+  /* 设置图片自适应手机屏大小 */
+        .responsive-img {
+            width: 100%;
+            height: auto;
+            max-width: 100%; /* 确保图片不会超出其父容器的宽度 */
+            margin-bottom: 20px; /* 图片之间的间距 */
+        }
+
+        /* 设置文本居中 */
+        .text-center {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .amount {
+            color: green;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .copy-btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .tip {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+         .tip.show {
+            opacity: 1;
+        }
+        .warning {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .qr-code img {
+            max-width: 100%; /* 图片最大宽度为屏幕宽度 */
+            height: auto; /* 高度自适应 */
+            display: block; /* 防止图片下方有空白 */
+            margin: 0 auto; /* 居中 */
+        }
+        .scan-text {
+            color: blue;
+            font-size: 16px;
+        }
+        .red-text {
+            color: red;
+        }
+        .green-test{
+        color: green;;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal {
+            width: 80vw;
+            height: 66vh;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-title {
+            color: #2A2D7C;
+            font-size: 30px;
+            font-weight: 600;
+            text-align: center;
+            margin: 10px 0 40px;
+        }
+        .notice-text {
+            color: #2A2D7C;
+            font-size: 20px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            flex: 1;
+            text-align: left
+        }
+        .amount1 {
+            color: #E63946;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 1px;
+        }
+        .amount1::after {
+            font-size: 10px;
+            color: red;
+            margin-left: 5px;
+        }
+        .confirm-btn {
+            padding: 12px 40px;
+            background: #9370DB;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            align-self: center;
+            transition: opacity 0.3s;
+        }
+        .confirm-btn:active {
+            opacity: 0.8;
+        }
+        .close-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body  onload="showModal()">
+
+    <!-- 第一个模块 -->
+    <div class="text-center">
+        <h1><strong >微信支付</strong></h1>
+        <p>商品名称：-秘密后花园</p>
+        <div>
+            <span class="amount">19.90</span>
+             <button class="copy-btn" onclick="copyText()">复制金额</button>
+            <div class="tip" id="tip"></div>
+        </div>
+        <p class="warning">请务必按照上方金额付款</p>
+    </div>
+
+    <!-- 第二个模块 -->
+
+    <div class="text-center">
+        <img src="./image/6.jpg" alt="Image 6" class="responsive-img">
+        <!-- 第三个模块 -->
+        <div class="text-center">
+        <p>
+            <span class="scan-text">长按识别</span>
+            <span class="red-text">或</span>
+            <span class="scan-text">截图</span>
+            <span class="red-text">微信扫码支付</span>
+        </p>
+        </div>
+        <img src="./image/7.jpg" alt="Image 6" class="responsive-img">
+    </div>
+   <div class="overlay" id="overlay">
+        <div class="modal">
+            <h2 class="modal-title">微信支付注意</h2>
+            <p class="notice-text">请在支付时务必支付订单金额，多付或者少付系统都无法识别，这将导致你的订单无法完成。
+            </p>
+            <div class="amount1">订单金额：19.90元【注意小数点】</div>
+            <button class="confirm-btn" onclick="closeModal()">懂了</button>
+        </div>
+    </div>
+<script>
+ function copyText() {
+            const tip = document.getElementById('tip')
+
+            // 新式剪贴板API
+            navigator.clipboard.writeText('19.90').then(() => {
+                showTip('复制成功', '#52c41a')
+            }).catch(() => {
+                // 降级方案
+                const input = document.createElement('textarea')
+                input.value = '19.90'
+                document.body.appendChild(input)
+                input.select()
+                const success = document.execCommand('copy')
+                document.body.removeChild(input)
+                showTip(success ? '复制成功' : '复制失败', success ? '#52c41a' : '#ff4d4f')
+            })
+        }
+     function showTip(text, color) {
+            const tip = document.getElementById('tip')
+            tip.textContent = text
+            tip.style.background = color
+            tip.classList.add('show')
+            setTimeout(() => tip.classList.remove('show'), 1500)
+        }
+     function showModal() {
+            document.getElementById('overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+</script>
+
+
+</body>
+</html>
